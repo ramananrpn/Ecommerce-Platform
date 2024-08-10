@@ -55,6 +55,7 @@ public class InventoryService {
         return new UpdateStockResponse(String.valueOf(product.getId()), newStock, Instant.now());
     }
 
+
     public void reduceStock(String productId, int quantity) throws BadRequestException {
         if (!productId.matches("\\d+")) {
             throw new BadRequestException("Invalid product ID");
@@ -72,7 +73,7 @@ public class InventoryService {
     }
 
     public void increaseStock(String productId, int quantity) {
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findById(Long.valueOf(productId))
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         product.setStock(product.getStock() + quantity);
