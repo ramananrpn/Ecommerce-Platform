@@ -14,10 +14,10 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
+    @Value("${security.jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
+    @Value("${security.jwt.expiration}")
     private long expirationTime;
 
     private Algorithm algorithm;

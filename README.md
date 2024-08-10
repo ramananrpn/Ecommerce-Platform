@@ -19,3 +19,28 @@ Provide instructions on how to use your application. Include any necessary comma
 - User Registration and Authentication
 - Product Listing
 - Order Management
+
+## Generating JWT Secret
+Using Command Line (Linux/macOS):
+```bash
+
+# Generate JWT Secret (64 bytes)
+JWT_SECRET=$(openssl rand -base64 48 | tr -d /=+ | cut -c -64)
+echo "JWT Secret: $JWT_SECRET"
+```
+
+Add values to application.properties file:
+```properties sample
+security.jwt.secret=aGVsbG9zdGFrZXRoZXNlY3JldGZvcnlvdXJhcHBsaWNhdGlvbg
+```
+
+For email configuration, add the following properties to the application.properties file:
+```properties sample
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=ramananrpn@gmail.com
+spring.mail.password=xxxxxxx
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+ ```
+
