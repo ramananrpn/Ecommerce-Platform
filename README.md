@@ -19,6 +19,8 @@ Provide instructions on how to use your application. Include any necessary comma
 - User Registration and Authentication
 - Product Listing
 - Order Management
+- Inventory Management
+- Notification Service
 
 ## Generating JWT Secret
 Using Command Line (Linux/macOS):
