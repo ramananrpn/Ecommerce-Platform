@@ -20,19 +20,18 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
-    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
     private UserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
+                                   JwtTokenProvider jwtTokenProvider,
+                                   UserDetailsService userDetailsService) {
         super(authenticationManager);
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
-        super(authenticationManager, authenticationEntryPoint);
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)

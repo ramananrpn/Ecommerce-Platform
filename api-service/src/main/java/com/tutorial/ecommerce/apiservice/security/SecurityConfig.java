@@ -6,6 +6,7 @@ import com.tutorial.ecommerce.security.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,11 +21,12 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public SecurityConfig( UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {
         this.userDetailsService = userDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
-
 
 
     @Bean
@@ -40,7 +42,8 @@ public class SecurityConfig {
                                         .requestMatchers("/api/inventory/**").hasAuthority(Role.ADMIN.name())
                                         .anyRequest().authenticated()
                                 )
-                                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager(http)), BasicAuthenticationFilter.class);
+                                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager(http), jwtTokenProvider, userDetailsService),
+                                        BasicAuthenticationFilter.class);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
