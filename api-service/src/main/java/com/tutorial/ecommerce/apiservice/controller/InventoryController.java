@@ -4,6 +4,7 @@ import com.tutorial.ecommerce.apiservice.dto.CheckStockResponse;
 import com.tutorial.ecommerce.apiservice.dto.UpdateStockRequest;
 import com.tutorial.ecommerce.apiservice.dto.UpdateStockResponse;
 import com.tutorial.ecommerce.apiservice.service.InventoryService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,14 +38,8 @@ public class InventoryController {
 
     @PutMapping("/{productId}")
     public ResponseEntity<UpdateStockResponse> updateStock(@PathVariable("productId") String productId,
-                                                           @RequestBody UpdateStockRequest request) {
-        try {
-            UpdateStockResponse response = inventoryService.updateStock(productId, request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+                                                           @RequestBody UpdateStockRequest request) throws BadRequestException {
+        UpdateStockResponse response = inventoryService.updateStock(productId, request);
+        return ResponseEntity.ok(response);
     }
 }
