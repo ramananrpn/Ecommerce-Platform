@@ -50,4 +50,7 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 ### Running the Docker Containers
 run docker-compose up
 
+## Sample Email Notification
+![img.png](img.png)
+
 

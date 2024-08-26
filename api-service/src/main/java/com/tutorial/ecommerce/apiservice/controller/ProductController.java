@@ -3,6 +3,7 @@ package com.tutorial.ecommerce.apiservice.controller;
 import com.tutorial.ecommerce.apiservice.service.ProductService;
 import com.tutorial.ecommerce.dto.ProductDto;
 import com.tutorial.ecommerce.model.Product;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto createProduct(@RequestBody ProductDto productDTO) {
+    public ProductDto createProduct(@RequestBody @Valid ProductDto productDTO) {
         return productService.addProduct(productDTO);
     }
 
@@ -47,9 +48,9 @@ public class ProductController {
 
     @GetMapping
     public Page<Product> listProducts(
-            @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam String sort,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "id,asc") String sort,
             @RequestParam(required = false) String category) {
         return productService.listProducts(page, size, sort, category);
     }

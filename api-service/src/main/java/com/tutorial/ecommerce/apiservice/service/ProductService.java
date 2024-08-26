@@ -1,6 +1,7 @@
 package com.tutorial.ecommerce.apiservice.service;
 
 import com.tutorial.ecommerce.dto.ProductDto;
+import com.tutorial.ecommerce.exception.NotFoundException;
 import com.tutorial.ecommerce.model.Product;
 import com.tutorial.ecommerce.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -38,11 +39,11 @@ public class ProductService {
 
     public Product getProduct(Long id) {
         Optional<Product> product = productRepository.findById(id);
-        return product.orElse(null);
+        return product.orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
     public Product updateProduct(Long id, ProductDto product) {
-        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new NotFoundException("Product not found"));
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setPrice(product.getPrice());
@@ -61,11 +62,19 @@ public class ProductService {
     }
 
     public Page<Product> listProducts(int page, int size, String sort, String category) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        String[] sortParameters = sort.split(",");
+        Sort.Direction sortDirection = Sort.Direction.fromString(sortParameters[1]);
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sortDirection, sortParameters[0]));
+        Page<Product> products;
         if (category != null && !category.isEmpty()) {
-            return productRepository.findByCategory(category, pageable);
+            products = productRepository.findByCategory(category, pageable);
+        } else {
+            products = productRepository.findAll(pageable);
         }
-        return productRepository.findAll(pageable);
+        if (products.isEmpty()) {
+            throw new NotFoundException("No products found");
+        }
+        return products;
     }
 
     public boolean productExists(String id) {

@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.tutorial.ecommerce.dto.ErrorResponse;
 import com.tutorial.ecommerce.exception.InvalidCredentialsException;
 import com.tutorial.ecommerce.exception.OrderNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -94,5 +95,21 @@ public class GlobalExceptionHandler {
         log.error("Token expired", ex);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Token expired");
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    // ConstraintViolationException
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        log.error("Constraint violation", ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    // NotFoundException
+    @ExceptionHandler(com.tutorial.ecommerce.exception.NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(com.tutorial.ecommerce.exception.NotFoundException ex) {
+        log.error("Resource not found", ex);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }

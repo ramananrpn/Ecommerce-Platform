@@ -1,7 +1,9 @@
 package com.tutorial.ecommerce.apiservice.validator;
 
 import com.tutorial.ecommerce.apiservice.dto.CreateOrderRequest;
+import com.tutorial.ecommerce.apiservice.dto.ProductOrderRequest;
 import com.tutorial.ecommerce.apiservice.service.ProductService;
+import com.tutorial.ecommerce.exception.BadRequestException;
 import com.tutorial.ecommerce.model.Order;
 import com.tutorial.ecommerce.repository.OrderRepository;
 import jakarta.validation.ConstraintViolation;
@@ -35,44 +37,24 @@ public class OrderValidation {
             for (ConstraintViolation<CreateOrderRequest> violation : violations) {
                 sb.append(violation.getMessage()).append(" ");
             }
-            throw new IllegalArgumentException(sb.toString().trim());
+            throw new BadRequestException(sb.toString().trim());
         }
 
         // Validate that all products exist and are available
-        List<String> productIds = request.getProductIds();
-        productIds.forEach(productId -> {
+        List<ProductOrderRequest> orders = request.getOrders();
+        orders.forEach(order -> {
+            String productId = order.getProductId();
             if (!productService.productExists(productId)) {
-                throw new IllegalArgumentException("Product ID " + productId + " does not exist.");
+                throw new BadRequestException("Product ID " + productId + " does not exist.");
+            }
+            if (order.getQuantity() <= 0) {
+                throw new BadRequestException("Quantity for product ID " + productId + " must be positive.");
             }
         });
 
         // Validate that address is not empty and has a valid format
         if (request.getAddress().trim().isEmpty()) {
             throw new IllegalArgumentException("Address cannot be empty.");
-        }
-
-        // Additional validations as needed
-    }
-
-    public void validateOrderUpdate(Order order, CreateOrderRequest request) {
-        // Validate address
-        if (request.getAddress() != null && request.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("Address cannot be empty.");
-        }
-
-        // Validate payment method if provided
-        if (request.getPaymentMethod() != null && request.getPaymentMethod().trim().isEmpty()) {
-            throw new IllegalArgumentException("Payment method cannot be empty.");
-        }
-
-        // Validate product IDs if provided
-        if (request.getProductIds() != null) {
-            List<String> productIds = request.getProductIds();
-            productIds.forEach(productId -> {
-                if (!productService.productExists(productId)) {
-                    throw new IllegalArgumentException("Product ID " + productId + " does not exist.");
-                }
-            });
         }
     }
 }

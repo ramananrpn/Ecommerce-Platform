@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class NotificationService {
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.from}")
     private String fromEmail;
 
     private final JavaMailSender emailSender;
@@ -24,6 +24,7 @@ public class NotificationService {
     public void sendNotification(NotificationRequest notificationRequest) {
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(emailSender.createMimeMessage(), true);
+            messageHelper.setFrom(fromEmail);
             messageHelper.setTo(notificationRequest.getRecipientEmail());
             messageHelper.setSubject(notificationRequest.getSubject());
             messageHelper.setText(notificationRequest.getMessage(), true);

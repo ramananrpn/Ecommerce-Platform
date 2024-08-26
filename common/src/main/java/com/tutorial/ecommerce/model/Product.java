@@ -39,7 +39,6 @@ public class Product {
     private BigDecimal price;
 
     @NotNull(message = "Stock is mandatory")
-    @Positive(message = "Stock must be positive")
     private Integer stock;
 
     @NotBlank(message = "Category is mandatory")
