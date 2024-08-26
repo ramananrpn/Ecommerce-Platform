@@ -44,9 +44,9 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authorize -> authorize
                                         .requestMatchers("/users/auth/login").permitAll()
                                         .requestMatchers("/users").authenticated()
-                                        .requestMatchers("/api/products/**").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
-                                        .requestMatchers("/api/orders/**").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
-                                        .requestMatchers("/api/inventory/**").hasAuthority(Role.ADMIN.name())
+                                        .requestMatchers("/products/**").hasAnyAuthority(Role.ADMIN.getRoleName(), Role.AGENT.getRoleName(), Role.USER.getRoleName())
+                                        .requestMatchers("/orders/**").hasAnyAuthority(Role.ADMIN.getRoleName(), Role.AGENT.getRoleName(), Role.USER.getRoleName())
+                                        .requestMatchers("/inventory/**").hasAuthority(Role.ADMIN.getRoleName())
                                         .anyRequest().authenticated()
                                 )
                                 .addFilterBefore(jwtAuthenticationFilter(http), BasicAuthenticationFilter.class);
