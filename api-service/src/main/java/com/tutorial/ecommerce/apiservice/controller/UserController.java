@@ -1,5 +1,6 @@
 package com.tutorial.ecommerce.apiservice.controller;
 
+import com.tutorial.ecommerce.apiservice.dto.UserUpdateRequest;
 import com.tutorial.ecommerce.dto.ErrorResponse;
 import com.tutorial.ecommerce.model.User;
 import com.tutorial.ecommerce.security.JwtTokenProvider;
@@ -10,6 +11,7 @@ import com.tutorial.ecommerce.apiservice.dto.UserRequest;
 import com.tutorial.ecommerce.apiservice.dto.UserResponse;
 import com.tutorial.ecommerce.apiservice.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -46,7 +48,7 @@ public class UserController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
             User user = userService.authenticateUser(loginRequest);
-            String token = jwtTokenProvider.generateToken(user.getUsername(), String.valueOf(user.getRole()));
+            String token = jwtTokenProvider.generateToken(user.getEmail(), String.valueOf(user.getRole()));
             return ResponseEntity.ok(new JwtResponse(token));
         } catch (BadCredentialsException e) {
             return new ResponseEntity<>(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid credentials"), HttpStatus.UNAUTHORIZED);
@@ -61,7 +63,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable @NotNull Long id, @Valid @RequestBody UserUpdateRequest userRequest) {
         User user = userService.updateUser(id, userRequest);
         UserResponse response = new UserResponse(user);
         return ResponseEntity.ok(response);

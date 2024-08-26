@@ -3,6 +3,8 @@ package com.tutorial.ecommerce.apiservice.security;
 import com.tutorial.ecommerce.model.Role;
 import com.tutorial.ecommerce.security.JwtAuthenticationFilter;
 import com.tutorial.ecommerce.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
@@ -22,10 +25,13 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
-    public SecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {
+
+    public SecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider, HandlerExceptionResolver handlerExceptionResolver) {
         this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.handlerExceptionResolver = handlerExceptionResolver;
     }
 
 
@@ -36,14 +42,14 @@ public class SecurityConfig {
                     try {
                         csrf.disable()
                                 .authorizeHttpRequests(authorize -> authorize
-                                        .requestMatchers("/api/auth/**").permitAll()
+                                        .requestMatchers("/users/auth/login").permitAll()
+                                        .requestMatchers("/users").authenticated()
                                         .requestMatchers("/api/products/**").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
                                         .requestMatchers("/api/orders/**").hasAnyAuthority(Role.ADMIN.name(), Role.USER.name())
                                         .requestMatchers("/api/inventory/**").hasAuthority(Role.ADMIN.name())
                                         .anyRequest().authenticated()
                                 )
-                                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager(http), jwtTokenProvider, userDetailsService),
-                                        BasicAuthenticationFilter.class);
+                                .addFilterBefore(jwtAuthenticationFilter(http), BasicAuthenticationFilter.class);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -64,5 +70,10 @@ public class SecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService);
         return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(HttpSecurity http) throws Exception {
+        return new JwtAuthenticationFilter(authenticationManager(http), jwtTokenProvider, userDetailsService, handlerExceptionResolver);
     }
 }

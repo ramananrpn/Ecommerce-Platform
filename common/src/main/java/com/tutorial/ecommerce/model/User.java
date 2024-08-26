@@ -1,5 +1,6 @@
 package com.tutorial.ecommerce.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -32,8 +33,9 @@ public class User {
     @NotBlank(message = "Username is mandatory")
     private String username;
 
-    @Email
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", message = "Invalid email format")
     @NotBlank(message = "Email is mandatory")
+    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "Password is mandatory")
