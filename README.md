@@ -1,6 +1,7 @@
 # Ecommerce-Platform
 
 ## Installation
+https://mailtrap.io/ - For testing email notifications
 
 ### Prerequisites
 - Java 11
