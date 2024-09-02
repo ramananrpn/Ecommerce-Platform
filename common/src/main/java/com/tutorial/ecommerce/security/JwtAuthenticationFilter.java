@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Component
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
@@ -103,7 +105,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private String[] extractCredentials(String header) {
-        String credentials = header.substring(BASIC_PREFIX.length()).trim();
+        String base64Credentials = header.substring(BASIC_PREFIX.length()).trim();
+        byte[] decoded = Base64.getDecoder().decode(base64Credentials);
+        String credentials = new String(decoded, StandardCharsets.UTF_8);
         return credentials.split(":", 2);
     }
 }
